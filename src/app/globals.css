@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 17%;
+    --primary: 47 100% 48%;
+    --primary-foreground: 0 0% 17%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 17%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 48%;
+    --accent: 47 100% 95%;
+    --accent-foreground: 0 0% 17%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 47 100% 48%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  /* Mejoras de accesibilidad */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ava-yellow;
+  }
+
+  /* Scrollbar personalizada */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-ava-gray;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ava-charcoal-light rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ava-charcoal-medium;
+  }
+}
+
+@layer components {
+  /* Animación de carga */
+  .loading-shimmer {
+    @apply animate-pulse bg-ava-gray-medium rounded;
+  }
+
+  /* Botón primario AVA */
+  .btn-ava-primary {
+    @apply bg-ava-yellow text-ava-charcoal font-semibold hover:bg-ava-yellow-dark
+           transition-colors duration-200 rounded-md px-4 py-2
+           focus-visible:ring-2 focus-visible:ring-ava-yellow focus-visible:ring-offset-2;
+  }
+
+  /* Card con sombra suave */
+  .card-ava {
+    @apply bg-white rounded-lg border border-ava-gray-medium shadow-sm
+           hover:shadow-md transition-shadow duration-200;
+  }
+}

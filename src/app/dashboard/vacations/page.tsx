@@ -1,0 +1,65 @@
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { VacationsManager } from "@/components/vacations/VacationsManager";
+
+export default async function VacationsPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile) redirect("/login");
+
+  let vacations = [];
+  let employeeId: string | null = null;
+  let employees = null;
+
+  if (profile.role === "admin") {
+    const { data } = await supabase
+      .from("vacation_requests")
+      .select(`*, employee:employees(first_name, last_name, department)`)
+      .order("created_at", { ascending: false });
+    vacations = data ?? [];
+
+    const { data: emps } = await supabase
+      .from("employees")
+      .select("id, first_name, last_name, department")
+      .eq("is_active", true)
+      .order("last_name");
+    employees = emps;
+  } else {
+    const { data: emp } = await supabase
+      .from("employees")
+      .select("id")
+      .eq("profile_id", user.id)
+      .single();
+
+    employeeId = emp?.id ?? null;
+
+    if (employeeId) {
+      const { data } = await supabase
+        .from("vacation_requests")
+        .select(`*, employee:employees(first_name, last_name, department)`)
+        .eq("employee_id", employeeId)
+        .order("created_at", { ascending: false });
+      vacations = data ?? [];
+    }
+  }
+
+  return (
+    <VacationsManager
+      vacations={vacations}
+      userRole={profile.role}
+      currentEmployeeId={employeeId}
+      employees={employees}
+    />
+  );
+}
