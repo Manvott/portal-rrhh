@@ -28,7 +28,7 @@ export default async function DashboardLayout({
   // Cargar perfil con rol del usuario
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("*")
+    .select("*, custom_permissions")
     .eq("id", user.id)
     .single();
 

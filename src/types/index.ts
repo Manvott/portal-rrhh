@@ -4,6 +4,21 @@
 
 export type UserRole = "admin" | "support" | "collaborator";
 
+// Permisos granulares para administradores
+// NULL = acceso total (admin por defecto)
+// Objeto con permisos específicos = solo los marcados como true
+export interface CustomPermissions {
+  employees_read?: boolean;
+  employees_write?: boolean;
+  documents_read?: boolean;
+  documents_write?: boolean;
+  vacations_read?: boolean;
+  vacations_approve?: boolean;
+  candidates_manage?: boolean;
+  support_view?: boolean;
+  users_manage?: boolean;
+}
+
 export type VacationStatus = "pending" | "approved" | "rejected" | "cancelled";
 
 export type DocumentCategory =
@@ -32,6 +47,7 @@ export interface Profile {
   is_active: boolean;
   gdpr_consent: boolean;
   gdpr_consent_date: string | null;
+  custom_permissions: CustomPermissions | null;
   created_at: string;
   updated_at: string;
 }
