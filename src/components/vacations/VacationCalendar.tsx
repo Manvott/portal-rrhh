@@ -4,16 +4,24 @@ import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface EmployeeData {
+  first_name: string;
+  last_name: string;
+  department: string | null;
+}
+
 interface ApprovedVacation {
   id: string;
   start_date: string;
   end_date: string;
   type: string;
-  employee?: {
-    first_name: string;
-    last_name: string;
-    department: string | null;
-  } | null;
+  employee?: EmployeeData | EmployeeData[] | null;
+}
+
+function getEmployee(employee: EmployeeData | EmployeeData[] | undefined | null): EmployeeData | null {
+  if (!employee) return null;
+  if (Array.isArray(employee)) return employee[0] ?? null;
+  return employee;
 }
 
 interface Props {
@@ -53,8 +61,9 @@ export function VacationCalendar({ approvedVacations }: Props) {
     const map: Record<string, typeof EMPLOYEE_COLORS[0]> = {};
     let colorIdx = 0;
     approvedVacations.forEach((v) => {
-      if (v.employee) {
-        const key = `${v.employee.first_name} ${v.employee.last_name}`;
+      const emp = getEmployee(v.employee);
+      if (emp) {
+        const key = `${emp.first_name} ${emp.last_name}`;
         if (!map[key]) {
           map[key] = EMPLOYEE_COLORS[colorIdx % EMPLOYEE_COLORS.length];
           colorIdx++;
@@ -114,8 +123,9 @@ export function VacationCalendar({ approvedVacations }: Props) {
     for (let day = 1; day <= daysInMonth; day++) {
       const key = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
       (vacationsByDay[key] ?? []).forEach((v) => {
-        if (v.employee) {
-          const name = `${v.employee.first_name} ${v.employee.last_name}`;
+        const emp = getEmployee(v.employee);
+        if (emp) {
+          const name = `${emp.first_name} ${emp.last_name}`;
           if (!seen.has(name)) {
             seen.add(name);
             result.push({ name, color: employeeColorMap[name] ?? EMPLOYEE_COLORS[0] });
@@ -206,12 +216,13 @@ export function VacationCalendar({ approvedVacations }: Props) {
                 {/* Indicadores de vacaciones (máx 3 visibles) */}
                 <div className="flex flex-wrap gap-0.5 overflow-hidden">
                   {dayvacs.slice(0, 3).map((v, i) => {
-                    const empName = v.employee
-                      ? `${v.employee.first_name} ${v.employee.last_name}`
+                    const emp = getEmployee(v.employee);
+                    const empName = emp
+                      ? `${emp.first_name} ${emp.last_name}`
                       : "?";
                     const color = employeeColorMap[empName] ?? EMPLOYEE_COLORS[0];
-                    const initials = v.employee
-                      ? getInitials(v.employee.first_name, v.employee.last_name)
+                    const initials = emp
+                      ? getInitials(emp.first_name, emp.last_name)
                       : "?";
                     return (
                       <span
@@ -250,8 +261,9 @@ export function VacationCalendar({ approvedVacations }: Props) {
             ) : (
               <div className="space-y-1.5">
                 {selectedVacations.map((v) => {
-                  const empName = v.employee
-                    ? `${v.employee.first_name} ${v.employee.last_name}`
+                  const emp = getEmployee(v.employee);
+                  const empName = emp
+                    ? `${emp.first_name} ${emp.last_name}`
                     : "Empleado";
                   const color = employeeColorMap[empName] ?? EMPLOYEE_COLORS[0];
                   const TYPE_LABELS: Record<string, string> = {
