@@ -53,15 +53,18 @@ export default async function VacationsPage() {
     }
   }
 
-  // Vacaciones aprobadas de TODOS los empleados → para el calendario compartido
-  // Visible para todos los roles (colaboradores ven el equipo)
+  // Vacaciones aprobadas de TODOS → calendario compartido
   const { data: approvedVacations } = await supabase
     .from("vacation_requests")
-    .select(`
-      id, start_date, end_date, type,
-      employee:employees(first_name, last_name, department)
-    `)
+    .select(`id, start_date, end_date, type, employee:employees(first_name, last_name, department)`)
     .eq("status", "approved")
+    .order("start_date", { ascending: true });
+
+  // Eventos del calendario (festivos, ferias, eventos empresa)
+  const { data: calendarEvents } = await supabase
+    .from("calendar_events")
+    .select("id, title, description, start_date, end_date, type, color")
+    .eq("is_public", true)
     .order("start_date", { ascending: true });
 
   return (
@@ -72,7 +75,11 @@ export default async function VacationsPage() {
         currentEmployeeId={employeeId}
         employees={employees}
       />
-      <VacationCalendar approvedVacations={approvedVacations ?? []} />
+      <VacationCalendar
+        approvedVacations={approvedVacations ?? []}
+        calendarEvents={calendarEvents ?? []}
+        userRole={profile.role}
+      />
     </div>
   );
 }

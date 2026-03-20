@@ -27,9 +27,9 @@ export function EditEmployeeForm({ employee }: Props) {
     department: employee.department ?? "",
     location: employee.location ?? "",
     contract_type: employee.contract_type ?? "",
-    nif: employee.nif ?? "",
-    social_security_number: employee.social_security_number ?? "",
-    iban: employee.iban ?? "",
+    nif: "",
+    social_security_number: "",
+    iban: "",
     address: employee.address ?? "",
     city: employee.city ?? "",
     postal_code: employee.postal_code ?? "",
@@ -67,28 +67,36 @@ export function EditEmployeeForm({ employee }: Props) {
 
     try {
       const supabase = createClient();
+      // Campos base (nunca contienen datos sensibles en memoria del cliente)
+      const updateData: Record<string, unknown> = {
+        first_name: form.first_name,
+        last_name: form.last_name,
+        email: form.email,
+        phone: form.phone || null,
+        birth_date: form.birth_date || null,
+        hire_date: form.hire_date || null,
+        position: form.position || null,
+        department: form.department || null,
+        location: form.location || null,
+        contract_type: form.contract_type || null,
+        address: form.address || null,
+        city: form.city || null,
+        postal_code: form.postal_code || null,
+        country: form.country || null,
+        emergency_contact_name: form.emergency_contact_name || null,
+        emergency_contact_phone: form.emergency_contact_phone || null,
+        notes: form.notes || null,
+        employee_number: form.employee_number || null,
+        is_active: form.is_active,
+      };
+      // Campos sensibles: solo se actualizan si el admin los rellena explícitamente
+      if (form.nif.trim()) updateData.nif = form.nif.trim();
+      if (form.social_security_number.trim()) updateData.social_security_number = form.social_security_number.trim();
+      if (form.iban.trim()) updateData.iban = form.iban.trim();
+
       const { error: updateError } = await supabase
         .from("employees")
-        .update({
-          ...form,
-          birth_date: form.birth_date || null,
-          hire_date: form.hire_date || null,
-          phone: form.phone || null,
-          position: form.position || null,
-          department: form.department || null,
-          location: form.location || null,
-          contract_type: form.contract_type || null,
-          nif: form.nif || null,
-          social_security_number: form.social_security_number || null,
-          iban: form.iban || null,
-          address: form.address || null,
-          city: form.city || null,
-          postal_code: form.postal_code || null,
-          emergency_contact_name: form.emergency_contact_name || null,
-          emergency_contact_phone: form.emergency_contact_phone || null,
-          notes: form.notes || null,
-          employee_number: form.employee_number || null,
-        })
+        .update(updateData)
         .eq("id", employee.id);
 
       if (updateError) throw updateError;
@@ -154,7 +162,7 @@ export function EditEmployeeForm({ employee }: Props) {
           <Field label="Email *" name="email" type="email" value={form.email} onChange={handleChange} required />
           <Field label="Teléfono" name="phone" type="tel" value={form.phone} onChange={handleChange} />
           <Field label="Fecha de nacimiento" name="birth_date" type="date" value={form.birth_date} onChange={handleChange} />
-          <Field label="NIF/NIE" name="nif" value={form.nif} onChange={handleChange} />
+          <Field label="NIF/NIE" name="nif" value={form.nif} onChange={handleChange} placeholder="Dejar vacío para mantener el actual" />
         </div>
       </Section>
 
@@ -185,7 +193,7 @@ export function EditEmployeeForm({ employee }: Props) {
               <option value="Obra y servicio">Obra y servicio</option>
             </select>
           </div>
-          <Field label="N° Seguridad Social" name="social_security_number" value={form.social_security_number} onChange={handleChange} />
+          <Field label="N° Seguridad Social" name="social_security_number" value={form.social_security_number} onChange={handleChange} placeholder="Dejar vacío para mantener el actual" />
         </div>
       </Section>
 
@@ -204,9 +212,9 @@ export function EditEmployeeForm({ employee }: Props) {
       {/* Datos bancarios */}
       <Section title="Datos Bancarios (Confidencial)">
         <Field label="IBAN" name="iban" value={form.iban} onChange={handleChange}
-          placeholder="ES00 0000 0000 0000 0000 0000" />
+          placeholder="Dejar vacío para mantener el actual (ej: ES00 0000 0000 0000 0000 0000)" />
         <p className="text-xs text-ava-charcoal-light mt-2">
-          Los datos bancarios están cifrados y son de acceso restringido.
+          🔒 Por seguridad, los datos bancarios no se muestran. Rellena solo si deseas actualizarlos.
         </p>
       </Section>
 

@@ -88,6 +88,15 @@ export default function PrivacyPage() {
                     candidaturas para posiciones en AVA Selección.</li>
                 <li><strong>Cumplimiento legal:</strong> cumplimiento de obligaciones fiscales,
                     laborales y de Seguridad Social.</li>
+                <li><strong>Calendario de equipo:</strong> las fechas de ausencias por vacaciones
+                    aprobadas son visibles para todos los empleados con fines de coordinación interna
+                    y planificación de recursos. Los eventos empresariales, ferias y festivos son
+                    igualmente visibles para todos los empleados. Esta visibilidad se basa en el
+                    interés legítimo del empleador para la correcta organización del trabajo
+                    (Art. 6.1.f RGPD).</li>
+                <li><strong>Gestión de habilidades:</strong> registro de competencias y habilidades
+                    profesionales de los empleados para la asignación óptima de recursos y procesos
+                    de selección interna.</li>
               </ul>
             </Section>
 
