@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === "development";
+
 const nextConfig: NextConfig = {
   // Seguridad: cabeceras HTTP de seguridad
   async headers() {
@@ -29,13 +31,18 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Strict-Transport-Security",
+            // 2 años, incluye subdominios y preload para HSTS
             value: "max-age=63072000; includeSubDomains; preload",
           },
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              // unsafe-eval solo en desarrollo (Next.js hot reload lo necesita)
+              // En producción se elimina para mayor seguridad contra XSS
+              isDev
+                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+                : "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               `img-src 'self' data: blob: https://${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('https://', '') || ''}`,
@@ -43,6 +50,8 @@ const nextConfig: NextConfig = {
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
+              // Forzar HTTPS en recursos mixtos
+              "upgrade-insecure-requests",
             ].join("; "),
           },
         ],

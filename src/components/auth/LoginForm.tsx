@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeRedirectPath } from "@/lib/security";
 import { Eye, EyeOff, LogIn, AlertCircle } from "lucide-react";
 
 export function LoginForm() {
@@ -43,30 +44,23 @@ export function LoginForm() {
       });
 
       if (authError) {
-        // Mensajes de error genéricos (sin revelar si el usuario existe)
-        if (
-          authError.message.includes("Invalid login credentials") ||
-          authError.message.includes("invalid_credentials")
-        ) {
-          setError(
-            "Credenciales incorrectas. Verifica tu email y contraseña."
-          );
-        } else if (authError.message.includes("Email not confirmed")) {
-          setError(
-            "Tu cuenta no ha sido confirmada. Revisa tu correo electrónico."
-          );
-        } else if (authError.message.includes("Too many requests")) {
+        // Mensajes de error genéricos (sin revelar si el usuario existe ni su estado)
+        if (authError.message.includes("Too many requests")) {
           setError(
             "Demasiados intentos de acceso. Por favor, espera unos minutos."
           );
         } else {
-          setError("Error al iniciar sesión. Inténtalo de nuevo.");
+          // Mensaje único para credenciales incorrectas, cuenta no confirmada
+          // y cualquier otro error — no revela información sobre la cuenta
+          setError(
+            "Credenciales incorrectas o acceso no autorizado. Verifica tus datos o contacta con soporte."
+          );
         }
         return;
       }
 
-      // Login exitoso → redirigir
-      const redirectTo = searchParams.get("redirectTo") || "/dashboard";
+      // Login exitoso → redirigir (sanitizando el parámetro para evitar Open Redirect)
+      const redirectTo = sanitizeRedirectPath(searchParams.get("redirectTo"));
       router.push(redirectTo);
       router.refresh();
     } catch {
