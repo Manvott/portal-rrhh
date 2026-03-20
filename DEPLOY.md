@@ -8,7 +8,7 @@
 
 ### 1.1 — Ejecutar las migraciones SQL
 
-1. Ve a: https://supabase.com/dashboard/project/dtrurlhlmuzvpoebrocc
+1. Ve a: https://supabase.com/dashboard/project/xvrfjrlvhvhfkmlducir
 2. Haz clic en **SQL Editor**
 3. Ejecuta los siguientes archivos en orden:
    - `supabase/migrations/001_initial_schema.sql`
@@ -25,7 +25,7 @@
 
 1. Ve a: **Settings → API**
 2. Copia:
-   - **Project URL**: `https://dtrurlhlmuzvpoebrocc.supabase.co`
+   - **Project URL**: `https://xvrfjrlvhvhfkmlducir.supabase.co`
    - **anon public**: tu clave pública
    - **service_role**: tu clave secreta (⚠️ NUNCA en el frontend)
 
@@ -55,7 +55,7 @@ WHERE email = 'admin@avaseleccion.es';
 En Vercel → Settings → Environment Variables, añade:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL = https://dtrurlhlmuzvpoebrocc.supabase.co
+NEXT_PUBLIC_SUPABASE_URL = https://xvrfjrlvhvhfkmlducir.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY = [tu anon key de Supabase]
 SUPABASE_SERVICE_ROLE_KEY = [tu service role key - solo backend]
 NEXT_PUBLIC_SITE_URL = https://[tu-dominio].vercel.app
