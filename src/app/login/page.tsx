@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { Suspense } from "react";
 import Link from "next/link";
 import { LoginForm } from "@/components/auth/LoginForm";
 
@@ -45,7 +45,9 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <LoginForm />
+            <Suspense fallback={<div className="h-48 flex items-center justify-center text-ava-charcoal-light text-sm">Cargando...</div>}>
+              <LoginForm />
+            </Suspense>
 
             {/* Enlace a privacidad */}
             <p className="text-center text-xs text-ava-charcoal-light mt-6">
