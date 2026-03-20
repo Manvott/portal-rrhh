@@ -1,13 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { VacationsManager } from "@/components/vacations/VacationsManager";
+import { VacationCalendar } from "@/components/vacations/VacationCalendar";
 
 export default async function VacationsPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const { data: profile } = await supabase
@@ -54,12 +53,26 @@ export default async function VacationsPage() {
     }
   }
 
+  // Vacaciones aprobadas de TODOS los empleados → para el calendario compartido
+  // Visible para todos los roles (colaboradores ven el equipo)
+  const { data: approvedVacations } = await supabase
+    .from("vacation_requests")
+    .select(`
+      id, start_date, end_date, type,
+      employee:employees(first_name, last_name, department)
+    `)
+    .eq("status", "approved")
+    .order("start_date", { ascending: true });
+
   return (
-    <VacationsManager
-      vacations={vacations}
-      userRole={profile.role}
-      currentEmployeeId={employeeId}
-      employees={employees}
-    />
+    <div className="space-y-6">
+      <VacationsManager
+        vacations={vacations}
+        userRole={profile.role}
+        currentEmployeeId={employeeId}
+        employees={employees}
+      />
+      <VacationCalendar approvedVacations={approvedVacations ?? []} />
+    </div>
   );
 }
