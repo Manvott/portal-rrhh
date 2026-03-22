@@ -39,7 +39,13 @@ export default async function ProfilePage() {
         .from("employee_skills")
         .select("skill:skills(name, category)")
         .eq("employee_id", emp.id);
-      employeeSkills = (skills ?? []) as typeof employeeSkills;
+      employeeSkills = (skills ?? []).map((s) => ({
+        skill: s.skill && !Array.isArray(s.skill)
+          ? { name: String((s.skill as { name: unknown; category: unknown }).name ?? ""), category: String((s.skill as { name: unknown; category: unknown }).category ?? "") }
+          : Array.isArray(s.skill) && s.skill.length > 0
+          ? { name: String(s.skill[0].name ?? ""), category: String(s.skill[0].category ?? "") }
+          : null,
+      }));
 
       // Formaciones
       const { data: trainings } = await supabase
