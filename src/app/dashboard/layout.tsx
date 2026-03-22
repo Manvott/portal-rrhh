@@ -48,6 +48,30 @@ export default async function DashboardLayout({
     redirect("/onboarding/gdpr-consent");
   }
 
+  // Conteo de notificaciones: vacaciones pendientes
+  let notificationCount = 0;
+  if (profile.role === "admin") {
+    const { count } = await supabase
+      .from("vacation_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pending");
+    notificationCount = count ?? 0;
+  } else if (profile.role === "collaborator") {
+    const { data: emp } = await supabase
+      .from("employees")
+      .select("id")
+      .eq("profile_id", user.id)
+      .single();
+    if (emp) {
+      const { count } = await supabase
+        .from("vacation_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("employee_id", emp.id)
+        .eq("status", "pending");
+      notificationCount = count ?? 0;
+    }
+  }
+
   return (
     <div className="flex h-screen bg-ava-gray overflow-hidden">
       {/* Sidebar navegación */}
@@ -55,7 +79,7 @@ export default async function DashboardLayout({
 
       {/* Contenido principal */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header profile={profile as Profile} />
+        <Header profile={profile as Profile} notificationCount={notificationCount} />
         <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>

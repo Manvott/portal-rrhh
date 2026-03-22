@@ -4,6 +4,7 @@ import { Users, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import type { Employee } from "@/types";
+import { ExportCSVButton } from "@/components/employees/ExportCSVButton";
 
 export default async function EmployeesPage({
   searchParams,
@@ -62,15 +63,18 @@ export default async function EmployeesPage({
             {employees?.length ?? 0} empleados en total
           </p>
         </div>
-        <Link
-          href="/dashboard/employees/new"
-          className="flex items-center gap-2 bg-ava-yellow hover:bg-ava-yellow-dark
-                     text-ava-charcoal font-semibold px-4 py-2 rounded-lg
-                     transition-colors text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          Nuevo empleado
-        </Link>
+        <div className="flex items-center gap-2">
+          <ExportCSVButton employees={employees ?? []} />
+          <Link
+            href="/dashboard/employees/new"
+            className="flex items-center gap-2 bg-ava-yellow hover:bg-ava-yellow-dark
+                       text-ava-charcoal font-semibold px-4 py-2 rounded-lg
+                       transition-colors text-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Nuevo empleado
+          </Link>
+        </div>
       </div>
 
       {/* Filtros */}

@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   profile: Profile;
+  notificationCount?: number;
 }
 
-export function Header({ profile }: HeaderProps) {
+export function Header({ profile, notificationCount = 0 }: HeaderProps) {
   return (
     <header className="bg-white border-b border-ava-gray-medium px-6 py-3 flex items-center justify-between shrink-0">
       {/* Búsqueda (solo admin) */}
@@ -48,6 +49,12 @@ export function Header({ profile }: HeaderProps) {
             aria-label="Notificaciones"
           >
             <Bell className="w-5 h-5" />
+            {notificationCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white
+                               text-[10px] font-bold rounded-full flex items-center justify-center">
+                {notificationCount > 9 ? "9+" : notificationCount}
+              </span>
+            )}
           </button>
         )}
       </div>

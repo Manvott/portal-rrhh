@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Edit, User, Phone, MapPin, Briefcase, FileText, CalendarDays } from "lucide-react";
 import type { Employee } from "@/types";
 import { SkillsManager } from "@/components/employees/SkillsManager";
+import { TrainingsManager } from "@/components/employees/TrainingsManager";
 
 export default async function EmployeeDetailPage({
   params,
@@ -53,6 +54,13 @@ export default async function EmployeeDetailPage({
     .eq("employee_id", id)
     .order("created_at", { ascending: false })
     .limit(5);
+
+  // Formaciones
+  const { data: trainings } = await supabase
+    .from("trainings")
+    .select("*")
+    .eq("employee_id", id)
+    .order("start_date", { ascending: false });
 
   // Habilidades
   const { data: allSkills } = await supabase
@@ -202,6 +210,15 @@ export default async function EmployeeDetailPage({
           employeeId={id}
           allSkills={allSkills ?? []}
           employeeSkills={employeeSkills ?? []}
+        />
+      </div>
+
+      {/* Formaciones */}
+      <div className="bg-white rounded-lg border border-ava-gray-medium p-6">
+        <TrainingsManager
+          employeeId={id}
+          trainings={trainings ?? []}
+          userRole={profile.role}
         />
       </div>
     </div>
