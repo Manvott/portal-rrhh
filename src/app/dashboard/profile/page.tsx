@@ -6,9 +6,7 @@ import { User } from "lucide-react";
 export default async function ProfilePage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const { data: profile } = await supabase
@@ -19,8 +17,14 @@ export default async function ProfilePage() {
 
   if (!profile) redirect("/login");
 
-  // Si es colaborador, cargar su ficha de empleado
   let employee = null;
+  let employeeSkills: { skill: { name: string; category: string } | null }[] = [];
+  let employeeTrainings: {
+    id: string; title: string; provider: string | null; category: string;
+    start_date: string; end_date: string | null; hours: number | null; status: string;
+  }[] = [];
+  let vacationDaysUsed = 0;
+
   if (profile.role === "collaborator" || profile.role === "admin") {
     const { data: emp } = await supabase
       .from("employees")
@@ -28,6 +32,36 @@ export default async function ProfilePage() {
       .eq("profile_id", user.id)
       .single();
     employee = emp;
+
+    if (emp) {
+      // Habilidades asignadas
+      const { data: skills } = await supabase
+        .from("employee_skills")
+        .select("skill:skills(name, category)")
+        .eq("employee_id", emp.id);
+      employeeSkills = (skills ?? []) as typeof employeeSkills;
+
+      // Formaciones
+      const { data: trainings } = await supabase
+        .from("trainings")
+        .select("id, title, provider, category, start_date, end_date, hours, status")
+        .eq("employee_id", emp.id)
+        .order("start_date", { ascending: false });
+      employeeTrainings = trainings ?? [];
+
+      // Días de vacaciones usados este año
+      const yearStart = `${new Date().getFullYear()}-01-01`;
+      const yearEnd = `${new Date().getFullYear()}-12-31`;
+      const { data: approvedVacs } = await supabase
+        .from("vacation_requests")
+        .select("days_count")
+        .eq("employee_id", emp.id)
+        .eq("status", "approved")
+        .eq("type", "vacation")
+        .gte("start_date", yearStart)
+        .lte("start_date", yearEnd);
+      vacationDaysUsed = (approvedVacs ?? []).reduce((sum, v) => sum + (v.days_count ?? 0), 0);
+    }
   }
 
   return (
@@ -42,7 +76,13 @@ export default async function ProfilePage() {
         </p>
       </div>
 
-      <ProfileForm profile={profile} employee={employee} />
+      <ProfileForm
+        profile={profile}
+        employee={employee}
+        employeeSkills={employeeSkills}
+        employeeTrainings={employeeTrainings}
+        vacationDaysUsed={vacationDaysUsed}
+      />
     </div>
   );
 }
